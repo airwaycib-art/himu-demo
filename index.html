@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>喜美影像資料館</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #c8a96e;
+      --gold-light: #e8d5a3;
+      --gold-dim: #8a6f3e;
+      --bg: #0e0c0a;
+      --bg2: #171410;
+      --bg3: #1f1b17;
+      --card-bg: #1a1611;
+      --border: #2e2820;
+      --text: #e8ddd0;
+      --text-dim: #8a7d6e;
+      --red: #c0392b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Noto Sans TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+    .header-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      height: 64px;
+    }
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .logo-zh {
+      font-family: "Noto Serif TC", serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+    }
+    .logo-en {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .header-line {
+      width: 1px;
+      height: 28px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    .search-wrap {
+      flex: 1;
+      max-width: 480px;
+      position: relative;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 9px 14px 9px 40px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input::placeholder { color: var(--text-dim); }
+    .search-wrap input:focus { border-color: var(--gold-dim); }
+
+    .count-badge {
+      margin-left: auto;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+    .count-badge span { color: var(--gold); font-weight: 600; }
+
+    /* ── Hero banner ── */
+    .hero {
+      border-bottom: 1px solid var(--border);
+      padding: 48px 32px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,169,110,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-block;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      padding: 4px 16px;
+      border-radius: 2px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-family: "Noto Serif TC", serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: 0.15em;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      font-weight: 300;
+    }
+    .hero-deco {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 24px;
+      color: var(--gold-dim);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+    }
+    .hero-deco::before, .hero-deco::after {
+      content: "";
+      height: 1px;
+      width: 80px;
+      background: linear-gradient(to right, transparent, var(--gold-dim));
+    }
+    .hero-deco::after {
+      background: linear-gradient(to left, transparent, var(--gold-dim));
+    }
+
+    /* ── Grid ── */
+    .grid-section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      position: relative;
+    }
+    .card:hover {
+      border-color: var(--gold-dim);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,169,110,0.1);
+    }
+
+    .thumb-wrap {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: #0a0908;
+    }
+    .thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease, opacity 0.3s;
+      opacity: 0.85;
+    }
+    .card:hover .thumb-wrap img {
+      transform: scale(1.04);
+      opacity: 1;
+    }
+    .thumb-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(14,12,10,0.7) 0%, transparent 50%);
+    }
+    .play-btn {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .card:hover .play-btn { opacity: 1; }
+    .play-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(200,169,110,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .play-circle svg { color: #0e0c0a; margin-left: 3px; }
+
+    .duration-tag {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.75);
+      color: var(--text);
+      font-size: 0.72rem;
+      padding: 2px 7px;
+      border-radius: 2px;
+      letter-spacing: 0.05em;
+      backdrop-filter: blur(4px);
+    }
+
+    .card-body {
+      padding: 14px 16px 12px;
+      border-top: 1px solid var(--border);
+    }
+    .card-title {
+      font-family: "Noto Serif TC", serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .like-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 0.78rem;
+      cursor: pointer;
+      padding: 4px 0;
+      font-family: inherit;
+      transition: color 0.2s;
+    }
+    .like-btn:hover { color: #e57373; }
+    .like-btn.liked { color: #e57373; }
+    .like-btn svg { transition: transform 0.2s; }
+    .like-btn:hover svg { transform: scale(1.2); }
+
+    .yt-link {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+    }
+    .yt-link:hover { color: var(--gold); }
+
+    /* ── Empty / Loading ── */
+    .status-msg {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      grid-column: 1/-1;
+    }
+    .status-msg .spinner {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--border);
+      border-top-color: var(--gold-dim);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      width: 100%;
+      max-width: 860px;
+      overflow: hidden;
+      transform: translateY(20px);
+      transition: transform 0.3s;
+      position: relative;
+    }
+    .modal-backdrop.open .modal { transform: translateY(0); }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .modal-close:hover { color: var(--text); border-color: var(--gold-dim); }
+
+    .modal-video {
+      position: relative;
+      padding-top: 56.25%;
+      background: #000;
+    }
+    .modal-video iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .modal-info {
+      padding: 20px 24px 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .modal-title {
+      font-family: "Noto Serif TC", serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      flex: 1;
+    }
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .modal-like-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 7px 14px;
+      font-family: inherit;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .modal-like-btn:hover { color: #e57373; border-color: #8b2020; }
+    .modal-like-btn.liked { color: #e57373; border-color: #8b2020; }
+
+    .modal-yt-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      text-decoration: none;
+      padding: 7px 14px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .modal-yt-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 32px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+    }
+    footer span { color: var(--gold-dim); }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header { padding: 0 16px; }
+      .hero { padding: 36px 16px 28px; }
+      .grid-section { padding: 24px 16px 60px; }
+      .grid { gap: 16px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+      .logo-en { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <span class="logo-zh">喜美影像資料館</span>
+      <span class="logo-en">Himi Archive</span>
+    </a>
+    <div class="header-line"></div>
+    <div class="search-wrap">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search" type="text" placeholder="搜尋影片標題…" autocomplete="off" />
+    </div>
+    <div class="count-badge">共 <span id="total-count">—</span> 部影片</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-tag">Classic Animation Archive</div>
+  <h1>喜美影像資料館</h1>
+  <p>收錄喜美動畫經典片段・珍藏記憶中的歡笑</p>
+  <div class="hero-deco">ThreeCat Bros</div>
+</div>
+
+<!-- Grid -->
+<div class="grid-section">
+  <div class="grid" id="grid">
+    <div class="status-msg"><div class="spinner"></div>正在載入典藏影像…</div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>喜美影像資料館 &nbsp;·&nbsp; <span>ThreeCat Bros</span> 動畫典藏</p>
+</footer>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modal-close" aria-label="關閉">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="modal-video">
+      <iframe id="modal-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+    <div class="modal-info">
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-actions">
+        <button class="modal-like-btn" id="modal-like-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span id="modal-likes">0</span>
+        </button>
+        <a class="modal-yt-btn" id="modal-yt-link" href="#" target="_blank" rel="noopener">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          YouTube
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDBKSaZxs-tbW7bhxMVkyAr8yJ9lcxrmY0",
+    authDomain: "claudeproject-a94ee.firebaseapp.com",
+    projectId: "claudeproject-a94ee",
+    storageBucket: "claudeproject-a94ee.firebasestorage.app",
+    messagingSenderId: "708325305180",
+    appId: "1:708325305180:web:b7617def9617d858a5af99"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let allVideos = [];
+  let currentYtId = null;
+  const likedSet = new Set(JSON.parse(localStorage.getItem("himi_liked") || "[]"));
+
+  function saveLiked() {
+    localStorage.setItem("himi_liked", JSON.stringify([...likedSet]));
+  }
+
+  function renderGrid(videos) {
+    const grid = document.getElementById("grid");
+    document.getElementById("total-count").textContent = allVideos.length;
+
+    if (!videos.length) {
+      grid.innerHTML = `<div class="status-msg">找不到符合的影片</div>`;
+      return;
+    }
+
+    grid.innerHTML = videos.map(v => {
+      const liked = likedSet.has(v.id);
+      return `
+      <div class="card" data-id="${v.id}" data-ytid="${v.ytId}" data-title="${v.title.replace(/"/g,'&quot;')}">
+        <div class="thumb-wrap">
+          <img src="https://i.ytimg.com/vi/${v.ytId}/hqdefault.jpg" alt="${v.title}" loading="lazy" />
+          <div class="thumb-overlay"></div>
+          <div class="play-btn">
+            <div class="play-circle">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+          </div>
+          ${v.duration ? `<div class="duration-tag">${v.duration}</div>` : ""}
+        </div>
+        <div class="card-body">
+          <div class="card-title">${v.title}</div>
+          <div class="card-footer">
+            <button class="like-btn${liked ? " liked" : ""}" data-id="${v.id}">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="${liked ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              ${v.likes || 0}
+            </button>
+            <a class="yt-link" href="https://youtu.be/${v.ytId}" target="_blank" rel="noopener" onclick="event.stopPropagation()">YouTube ↗</a>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+
+    // Card click → open modal
+    grid.querySelectorAll(".card").forEach(card => {
+      card.addEventListener("click", e => {
+        if (e.target.closest(".like-btn") || e.target.closest(".yt-link")) return;
+        openModal(card.dataset.id, card.dataset.ytid, card.dataset.title);
+      });
+    });
+
+    // Like buttons in grid
+    grid.querySelectorAll(".like-btn").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        toggleLike(btn.dataset.id, btn);
+      });
+    });
+  }
+
+  function filter() {
+    const q = document.getElementById("search").value.trim().toLowerCase();
+    const filtered = q ? allVideos.filter(v => v.title.toLowerCase().includes(q)) : allVideos;
+    renderGrid(filtered);
+  }
+
+  // Firestore realtime
+  onSnapshot(collection(db, "videos"), snap => {
+    allVideos = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (a.title > b.title ? 1 : -1));
+    filter();
+  });
+
+  document.getElementById("search").addEventListener("input", filter);
+
+  // ── Modal ──
+  function openModal(id, ytId, title) {
+    currentYtId = ytId;
+    document.getElementById("modal-iframe").src =
+      `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
+    document.getElementById("modal-title").textContent = title;
+    document.getElementById("modal-yt-link").href = `https://youtu.be/${ytId}`;
+
+    const liked = likedSet.has(id);
+    const likeBtn = document.getElementById("modal-like-btn");
+    likeBtn.className = "modal-like-btn" + (liked ? " liked" : "");
+    likeBtn.dataset.id = id;
+
+    // Fetch current likes
+    getDoc(doc(db, "videos", id)).then(d => {
+      document.getElementById("modal-likes").textContent = d.data()?.likes || 0;
+    });
+
+    document.getElementById("modal-backdrop").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    document.getElementById("modal-backdrop").classList.remove("open");
+    document.getElementById("modal-iframe").src = "";
+    document.body.style.overflow = "";
+    currentYtId = null;
+  }
+
+  document.getElementById("modal-close").addEventListener("click", closeModal);
+  document.getElementById("modal-backdrop").addEventListener("click", e => {
+    if (e.target === document.getElementById("modal-backdrop")) closeModal();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+  // ── Like ──
+  async function toggleLike(id, btnEl) {
+    if (!id) return;
+    const alreadyLiked = likedSet.has(id);
+    const delta = alreadyLiked ? -1 : 1;
+
+    if (alreadyLiked) likedSet.delete(id);
+    else likedSet.add(id);
+    saveLiked();
+
+    // Update UI immediately
+    if (btnEl) {
+      btnEl.classList.toggle("liked", !alreadyLiked);
+      const svg = btnEl.querySelector("svg");
+      if (svg) svg.setAttribute("fill", !alreadyLiked ? "currentColor" : "none");
+    }
+
+    // Sync count text
+    const countEl = btnEl?.querySelector("span") || document.getElementById("modal-likes");
+    if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent || "0") + delta);
+
+    // Persist to Firestore
+    await updateDoc(doc(db, "videos", id), { likes: increment(delta) });
+  }
+
+  document.getElementById("modal-like-btn").addEventListener("click", function() {
+    toggleLike(this.dataset.id, this);
+  });
+</script>
+</body>
+</html>

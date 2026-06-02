@@ -14,6 +14,12 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // 喜美影像資料館影片集合
+    match /videos/{document} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     // 其他集合預設禁止存取
     match /{document=**} {
       allow read, write: if false;
