@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>學生成績查詢</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    header h1 {
+      font-size: 2rem;
+      color: #1a202c;
+      font-weight: 700;
+    }
+    header p {
+      color: #718096;
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      max-width: 860px;
+      margin: 0 auto 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .toolbar input {
+      flex: 1;
+      min-width: 180px;
+      padding: 10px 16px;
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .toolbar input:focus { border-color: #667eea; }
+
+    .toolbar select {
+      padding: 10px 14px;
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      max-width: 860px;
+      margin: 0 auto 28px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px 20px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #667eea;
+    }
+    .stat-card .label {
+      font-size: 0.82rem;
+      color: #718096;
+      margin-top: 4px;
+    }
+
+    table {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    thead {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+    }
+    thead th {
+      padding: 14px 18px;
+      text-align: left;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      user-select: none;
+    }
+    thead th:hover { background: rgba(255,255,255,0.15); }
+    thead th .arrow { margin-left: 4px; opacity: 0.6; }
+
+    tbody tr {
+      border-bottom: 1px solid #e2e8f0;
+      transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f7f8ff; }
+
+    td {
+      padding: 14px 18px;
+      font-size: 0.93rem;
+      color: #2d3748;
+    }
+
+    .score-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .score-bar {
+      flex: 1;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.6s ease;
+    }
+    .score-num {
+      font-weight: 700;
+      width: 36px;
+      text-align: right;
+      font-size: 0.95rem;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .tag-積極  { background: #bee3f8; color: #2b6cb0; }
+    .tag-認真  { background: #c6f6d5; color: #276749; }
+    .tag-需關注 { background: #feebc8; color: #c05621; }
+    .tag-優秀  { background: #e9d8fd; color: #6b46c1; }
+    .tag-穩定  { background: #e2e8f0; color: #4a5568; }
+
+    .empty {
+      text-align: center;
+      padding: 48px;
+      color: #a0aec0;
+      font-size: 0.95rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: #667eea;
+      font-size: 1rem;
+    }
+
+    .rank { font-weight: 700; color: #667eea; }
+    .rank-1 { color: #f6ad55; }
+    .rank-2 { color: #a0aec0; }
+    .rank-3 { color: #c6a267; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📊 學生成績查詢</h1>
+  <p id="subtitle">載入中…</p>
+</header>
+
+<div class="stats">
+  <div class="stat-card"><div class="value" id="stat-total">—</div><div class="label">總人數</div></div>
+  <div class="stat-card"><div class="value" id="stat-avg">—</div><div class="label">平均分數</div></div>
+  <div class="stat-card"><div class="value" id="stat-max">—</div><div class="label">最高分</div></div>
+  <div class="stat-card"><div class="value" id="stat-min">—</div><div class="label">最低分</div></div>
+</div>
+
+<div class="toolbar">
+  <input type="text" id="search" placeholder="🔍 搜尋姓名或班級…" />
+  <select id="class-filter">
+    <option value="">全部班級</option>
+  </select>
+  <select id="sort-select">
+    <option value="seat_number">依座號排序</option>
+    <option value="score-desc">分數高→低</option>
+    <option value="score-asc">分數低→高</option>
+  </select>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>名次</th>
+      <th>座號</th>
+      <th>姓名</th>
+      <th>班級</th>
+      <th>分數</th>
+      <th>標記</th>
+    </tr>
+  </thead>
+  <tbody id="tbody">
+    <tr><td colspan="6" class="loading">⏳ 載入資料中…</td></tr>
+  </tbody>
+</table>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDBKSaZxs-tbW7bhxMVkyAr8yJ9lcxrmY0",
+    authDomain: "claudeproject-a94ee.firebaseapp.com",
+    projectId: "claudeproject-a94ee",
+    storageBucket: "claudeproject-a94ee.firebasestorage.app",
+    messagingSenderId: "708325305180",
+    appId: "1:708325305180:web:b7617def9617d858a5af99"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  let allStudents = [];
+
+  // 分數對應顏色
+  function scoreColor(s) {
+    if (s >= 90) return "#48bb78";
+    if (s >= 75) return "#667eea";
+    if (s >= 60) return "#ed8936";
+    return "#fc8181";
+  }
+
+  // 更新統計卡
+  function updateStats(data) {
+    if (!data.length) {
+      ["total","avg","max","min"].forEach(k => document.getElementById("stat-"+k).textContent = "—");
+      return;
+    }
+    const scores = data.map(s => s.score);
+    document.getElementById("stat-total").textContent = data.length;
+    document.getElementById("stat-avg").textContent   = (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1);
+    document.getElementById("stat-max").textContent   = Math.max(...scores);
+    document.getElementById("stat-min").textContent   = Math.min(...scores);
+  }
+
+  // 渲染表格
+  function render() {
+    const q     = document.getElementById("search").value.trim().toLowerCase();
+    const cls   = document.getElementById("class-filter").value;
+    const sort  = document.getElementById("sort-select").value;
+
+    let data = allStudents.filter(s =>
+      (!q   || s.name.includes(q) || s.class.includes(q)) &&
+      (!cls || s.class === cls)
+    );
+
+    // 排序
+    if (sort === "score-desc") data.sort((a,b) => b.score - a.score);
+    else if (sort === "score-asc") data.sort((a,b) => a.score - b.score);
+    else data.sort((a,b) => a.seat_number - b.seat_number);
+
+    // 名次（依分數全體排）
+    const ranked = [...allStudents].sort((a,b) => b.score - a.score);
+    const rankOf = id => ranked.findIndex(s => s.id === id) + 1;
+
+    updateStats(data);
+
+    const tbody = document.getElementById("tbody");
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty">找不到符合的學生</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(s => {
+      const rank = rankOf(s.id);
+      const rankClass = rank <= 3 ? `rank rank-${rank}` : "rank";
+      const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
+      const color = scoreColor(s.score);
+      const pct   = s.score;
+      const tagCls = "tag tag-" + (s.tag || "");
+      return `
+        <tr>
+          <td><span class="${rankClass}">${medal}</span></td>
+          <td>${s.seat_number}</td>
+          <td><strong>${s.name}</strong></td>
+          <td>${s.class}</td>
+          <td>
+            <div class="score-bar-wrap">
+              <div class="score-bar">
+                <div class="score-bar-fill" style="width:${pct}%;background:${color}"></div>
+              </div>
+              <span class="score-num" style="color:${color}">${s.score}</span>
+            </div>
+          </td>
+          <td><span class="${tagCls}">${s.tag || ""}</span></td>
+        </tr>`;
+    }).join("");
+  }
+
+  // 即時監聽 Firestore
+  onSnapshot(collection(db, "students"), snap => {
+    allStudents = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // 填充班級下拉
+    const classes = [...new Set(allStudents.map(s => s.class))].sort();
+    const sel = document.getElementById("class-filter");
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">全部班級</option>` +
+      classes.map(c => `<option value="${c}" ${c===cur?"selected":""}>${c}</option>`).join("");
+
+    document.getElementById("subtitle").textContent =
+      `共 ${allStudents.length} 位學生・即時同步中`;
+
+    render();
+  });
+
+  // 事件
+  ["search","class-filter","sort-select"].forEach(id =>
+    document.getElementById(id).addEventListener("input", render)
+  );
+</script>
+</body>
+</html>
