@@ -456,6 +456,140 @@
     }
     footer span { color: var(--gold-dim); }
 
+    /* ── Gate ── */
+    #gate {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0;
+      transition: opacity 0.6s, visibility 0.6s;
+    }
+    #gate.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .gate-inner {
+      text-align: center;
+      max-width: 480px;
+      padding: 48px 32px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg2);
+      position: relative;
+    }
+    .gate-inner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 4px;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,169,110,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .gate-tag {
+      display: inline-block;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold-dim);
+      font-size: 0.68rem;
+      letter-spacing: 0.25em;
+      padding: 3px 14px;
+      border-radius: 2px;
+      margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+    .gate-title {
+      font-family: "Noto Serif TC", serif;
+      font-size: 1.5rem;
+      color: var(--gold-light);
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+    .gate-sub {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 36px;
+    }
+    .gate-question {
+      font-family: "Noto Serif TC", serif;
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+    }
+    .gate-question span {
+      color: var(--gold);
+    }
+    .gate-input-wrap {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .gate-input {
+      flex: 1;
+      padding: 11px 16px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: "Noto Serif TC", serif;
+      outline: none;
+      transition: border-color 0.2s;
+      text-align: center;
+      letter-spacing: 0.1em;
+    }
+    .gate-input:focus { border-color: var(--gold-dim); }
+    .gate-input.error { border-color: #c0392b; animation: shake 0.4s; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    .gate-btn {
+      padding: 11px 22px;
+      background: var(--gold-dim);
+      border: none;
+      border-radius: 4px;
+      color: #0e0c0a;
+      font-size: 0.9rem;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .gate-btn:hover { background: var(--gold); }
+    .gate-error {
+      color: #e57373;
+      font-size: 0.8rem;
+      height: 18px;
+      letter-spacing: 0.05em;
+    }
+    .gate-deco {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--border);
+      margin: 28px 0 0;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+    }
+    .gate-deco::before, .gate-deco::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
     /* ── Responsive ── */
     @media (max-width: 600px) {
       header { padding: 0 16px; }
@@ -467,6 +601,22 @@
   </style>
 </head>
 <body>
+
+<!-- Gate -->
+<div id="gate">
+  <div class="gate-inner">
+    <div class="gate-tag">Archive Access</div>
+    <div class="gate-title">喜美影像資料館</div>
+    <div class="gate-sub">入館前請回答以下問題</div>
+    <div class="gate-question">喜美最討厭吃什麼？</div>
+    <div class="gate-input-wrap">
+      <input class="gate-input" id="gate-input" type="text" placeholder="請輸入答案…" autocomplete="off" />
+      <button class="gate-btn" id="gate-btn">進入</button>
+    </div>
+    <div class="gate-error" id="gate-error"></div>
+    <div class="gate-deco">ThreeCat Bros</div>
+  </div>
+</div>
 
 <!-- Header -->
 <header>
@@ -528,6 +678,38 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Gate logic
+  const ANSWER = "雜草";
+  const gate = document.getElementById("gate");
+  const gateInput = document.getElementById("gate-input");
+  const gateBtn = document.getElementById("gate-btn");
+  const gateError = document.getElementById("gate-error");
+
+  if (sessionStorage.getItem("himi_access") === "1") {
+    gate.classList.add("hidden");
+  }
+
+  function tryEnter() {
+    const val = gateInput.value.trim();
+    if (val === ANSWER) {
+      sessionStorage.setItem("himi_access", "1");
+      gate.classList.add("hidden");
+      gateError.textContent = "";
+    } else {
+      gateInput.classList.remove("error");
+      void gateInput.offsetWidth; // reflow to restart animation
+      gateInput.classList.add("error");
+      gateError.textContent = "答案不對，再想想喜美的故事…";
+      gateInput.value = "";
+      gateInput.focus();
+    }
+  }
+
+  gateBtn.addEventListener("click", tryEnter);
+  gateInput.addEventListener("keydown", e => { if (e.key === "Enter") tryEnter(); });
+</script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
