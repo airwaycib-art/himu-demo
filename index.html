@@ -112,6 +112,43 @@
     }
     .count-badge span { color: var(--gold); font-weight: 600; }
 
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      font-family: inherit;
+      letter-spacing: 0.08em;
+      padding: 6px 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .logout-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+    /* 倒數計時小提示 */
+    #idle-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--bg3);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold-light);
+      font-size: 0.82rem;
+      padding: 10px 20px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+      z-index: 300;
+      transition: transform 0.3s;
+      white-space: nowrap;
+    }
+    #idle-toast.show { transform: translateX(-50%) translateY(0); }
+
     /* ── Hero banner ── */
     .hero {
       border-bottom: 1px solid var(--border);
@@ -639,8 +676,14 @@
       <input id="search" type="text" placeholder="搜尋影片標題…" autocomplete="off" />
     </div>
     <div class="count-badge">共 <span id="total-count">—</span> 部影片</div>
+    <button class="logout-btn" id="logout-btn" title="登出">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      登出
+    </button>
   </div>
 </header>
+
+<div id="idle-toast">閒置超過 10 分鐘，即將自動登出…</div>
 
 <!-- Hero -->
 <div class="hero">
@@ -826,9 +869,56 @@
     toggleLike(this.dataset.id, this);
   });
 
+  // ── 登出 & 自動登出 ──
+  const IDLE_MS = 10 * 60 * 1000;      // 10 分鐘
+  const WARN_MS = IDLE_MS - 60 * 1000; // 提前 1 分鐘提示
+  let idleTimer = null;
+  let warnTimer = null;
+  const toast = document.getElementById("idle-toast");
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    clearTimeout(warnTimer);
+    toast.classList.remove("show");
+
+    warnTimer = setTimeout(() => {
+      toast.classList.add("show"); // 提示還有 1 分鐘
+    }, WARN_MS);
+
+    idleTimer = setTimeout(() => {
+      doLogout();
+    }, IDLE_MS);
+  }
+
+  async function doLogout() {
+    clearTimeout(idleTimer);
+    clearTimeout(warnTimer);
+    toast.classList.remove("show");
+    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+    await auth.signOut();
+    gate.classList.remove("hidden");
+    document.getElementById("grid").innerHTML =
+      `<div class="status-msg"><div class="spinner"></div>正在載入典藏影像…</div>`;
+    document.getElementById("total-count").textContent = "—";
+    gateInput.value = "";
+    gateError.textContent = "";
+  }
+
+  // 監聽所有使用者操作以重置計時
+  const ACTIVITY_EVENTS = ["mousemove", "mousedown", "keydown", "touchstart", "scroll", "wheel"];
+  ACTIVITY_EVENTS.forEach(ev =>
+    document.addEventListener(ev, resetIdleTimer, { passive: true })
+  );
+
+  document.getElementById("logout-btn").addEventListener("click", doLogout);
+
   // 若已登入則直接放行並啟動 Firestore
   onAuthStateChanged(auth, user => {
-    if (user) { gate.classList.add("hidden"); startFirestore(); }
+    if (user) {
+      gate.classList.add("hidden");
+      startFirestore();
+      resetIdleTimer();
+    }
   });
 
   async function tryEnter() {
