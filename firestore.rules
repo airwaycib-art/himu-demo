@@ -14,10 +14,10 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
-    // 喜美影像資料館影片集合
+    // 喜美影像資料館影片集合：必須登入才能讀取，登入後可更新按讚
     match /videos/{document} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
     }
 
     // 其他集合預設禁止存取
