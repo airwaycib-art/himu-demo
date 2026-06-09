@@ -653,7 +653,7 @@
     <div class="gate-tag">Archive Access</div>
     <div class="gate-title">喜美影像資料館</div>
     <div class="gate-sub">入館前請回答以下問題</div>
-    <div class="gate-question">喜美最討厭吃什麼？</div>
+    <div class="gate-question" id="gate-question"></div>
     <div class="gate-input-wrap">
       <input class="gate-input" id="gate-input" type="text" placeholder="請輸入答案…" autocomplete="off" />
       <button class="gate-btn" id="gate-btn">進入</button>
@@ -755,6 +755,14 @@
   const gateInput = document.getElementById("gate-input");
   const gateBtn = document.getElementById("gate-btn");
   const gateError = document.getElementById("gate-error");
+
+  // 隨機出題
+  const GATE_QUESTIONS = [
+    "喜美最喜歡吃什麼？",
+    "喜美的絕招？",
+  ];
+  const randomQ = GATE_QUESTIONS[Math.floor(Math.random() * GATE_QUESTIONS.length)];
+  document.getElementById("gate-question").textContent = randomQ;
 
   // ── Firestore ──
   let allVideos = [];
