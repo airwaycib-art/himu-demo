@@ -732,7 +732,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-  import { getAuth, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
   import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-functions.js";
   import { getFirestore, collection, onSnapshot, doc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
@@ -935,8 +935,8 @@
     try {
       // 傳答案到伺服器驗證（答案不在原始碼中）
       const result = await verifyGateAnswer({ answer: val });
-      // 用 Custom Token 登入（不需要帳密）
-      await signInWithCustomToken(auth, result.data.token);
+      // 用伺服器回傳的帳密登入（帳密不在原始碼中）
+      await signInWithEmailAndPassword(auth, result.data.email, result.data.password);
       gate.classList.add("hidden");
     } catch (e) {
       shake();
